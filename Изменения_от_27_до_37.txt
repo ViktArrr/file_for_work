@@ -1,0 +1,23 @@
+Какие библиотеки на что меняю
+MySQLdb -> pymysql
+MySQLdb.install_as_MySQLdb()
+cookielib -> http.cookiejar
+from _mysql_exceptions import OperationalError -> from pymysql.err import OperationalError
+.format -> f""
+unicode -> str
+str -> bytes
+urllib -> urllib.parse
+long -> int
+bytesarray(bytes) -> bytesarray(bytes, "utf-8")
+class Class(object) -> class Class:
+for i in d.keys(): -> for i in list(d):
+iteritems() -> items()
+
+
+
+
+PY_VERSION = sys.version_info[0]
+if PY_VERSION == 2:
+	pass
+else:
+	pass

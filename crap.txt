@@ -1,0 +1,67 @@
+# -*- coding: utf-8 -*-
+
+from collections import defaultdict
+from datetime import datetime, timedelta
+
+from steam.shared import get_database_name
+
+
+def check_duplicates(offer_data, offer_skins, database):
+    """
+    Проверяет оффер на дублирование.
+
+    Важно:
+        Из скинов оффера, узнаём steamid64 партнера.
+
+    Алгоритм:
+        1. Подготовка данных к запросу в бд.
+        2. Запрос в бд.
+        3. Проверка на пустой ответ бд.
+        4. Упаковка данных пользователя.
+        5. Сложение скинов, для отправки и получения в обмене, в один список.
+        6. Упаковка данных бота.
+        7. Поиск дублей.
+
+    @param offer_data: Данные обмена с фронта.
+    @param offer_skins: Скины обмена.
+    @param database: Объект базы данных.
+    @return: Значение False если это не дупликат, иначе это дупликат и вернём requests_id.
+
+    """
+    database_name = get_database_name(offer_data['appid'])
+    d_time = datetime.now() - timedelta(minutes=3)
+    on_wallet = offer_data['onWallet']
+    partner = offer_skins.get('partner')
+    partner_steamid64 = partner.keys()[0]
+
+    user_offers = database.query(
+        "SELECT tb2.assetid, tb2.user_skin_id, tb1.id as request_id "
+        "FROM {}.offers_requests as tb1 LEFT JOIN {}.offers_skins as tb2 ON tb1.id=tb2.requests_id "
+        "WHERE "
+            "tb1.start_time>='{}' AND "
+            "tb1.on_wallet={} AND "
+            "tb2.steamid64={}"
+        "".format(database_name, database_name, d_time, on_wallet, partner_steamid64)
+    )
+    user_offers = ((14701727852L, None, 1), (14701727222L, None, 2), (14701727851L, 33332222111L, 2)) #  Подстановка
+
+    if not user_offers:
+        return None
+
+    previous_requests = defaultdict(set)
+    for assetid, user_skin_id, requests_id in user_offers:
+        previous_requests[requests_id].add(user_skin_id or assetid)
+
+    offer_skins = offer_skins['bot'].values() + offer_skins['partner'].values()
+    current_skins = {skin for skins in offer_skins for skin in skins}
+
+    for requests_id, assets in previous_requests.items():
+        if assets == current_skins:
+            return requests_id
+
+    return None
+
+
+
+if __name__ == '__main__':
+    pass

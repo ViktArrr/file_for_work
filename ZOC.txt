@@ -1,0 +1,54 @@
+делай git pull на сервер когда обновляешь файл
+sudo apt-get install python3-pip
+sudo pip3 install -U setuptools
+sudo python3.7 -m pip install ujson установка пипом на разные версии
+sudo ln -sf python3 /usr/bin/python смена версии питона
+
+sudo nano редактор файла
+sudo rm удалить файл
+
+заливаешь новые файлы методом исправления конфигов, потом надо написать:
+sudo supervisorctl reread
+sudo supervisorctl update
+
+ls -la /etc/supervisor/conf.d
+cat /etc/supervisor/conf.d/send_offers.conf
+cat /etc/supervisor/conf.d/confirm_offers.conf
+cat /etc/supervisor/conf.d/accept_offers.conf
+cat /etc/supervisor/conf.d/check_offers.conf
+cat /etc/supervisor/conf.d/check_sent_offers.conf
+
+ls -la /var/log/supervisor/
+tail -f /var/log/supervisor/new_send_offers.err.log
+tail -f /var/log/supervisor/new_confirm_offers.err.log
+tail -f /var/log/supervisor/new_check_offers.err.log
+tail -f /var/log/supervisor/new_accept_offers.err.log
+tail -f /var/log/supervisor/new_check_sent_offers.err.log
+
+less просматривает файл в прошлом
+tail просматривает файл в настоящем
+
+ctrl + d - disconect
+alt + d - новый коннект
+alt + t -  новый таб
+
+старт c нуля
+sudo apt-get update
+apt-get install supervisor
+apt-get install python3.7
+sudo apt-get update
+cd /etc/supervisor/conf.d
+[program:send_offers]
+directory=/home/pavel/trader
+command=python3.7 new_send_offers.py 730 Csgomoney
+autostart=true
+autorestart=true
+startretries=10800
+user=pavel
+stderr_logfile=/var/log/supervisor/new_send_offers.err.log
+stdout_logfile=/var/log/supervisor/new_send_offers.out.log
+stopasgroup=true
+
+ls -l /usr/bin/ | grep python3.
+решение проблем
+sudo apt-get install libpython3.7-dev

@@ -1,0 +1,19 @@
+Подстановки офферов
+Сенд
+fetched_offers = ((1, None, 'alaclcdcsdcscscsdjcs', 76561198176718195, 'https://steamcommunity.com/tradeoffer/new/?partner=216452467&token=ewfW93KS', None),)
+skins = ((1, 570, 8865062018, 'bot'),)
+steamids = (('alaclcdcsdcscscsdjcs',),)
+steamids = (('Poland_Panda',),)
+
+Конфирм
+offers = (('alaclcdcsdcscscsdjcs', None, 76561198176718195, 3327683391),)
+confirm_other_side = ((1, None, 76561198176718195, 3322327017, 'alaclcdcsdcscscsdjcs3'),)
+confirm_other_side = False
+offers_with_skins = ((1, 5),)
+
+Аксепт
+selected_offers = ((76561198337508335, 1, 'Poland_Panda', 3334282822),)
+
+Чек
+direct_offers = (('alaclcdcsdcscscsdjcs', None, 1, 76561198311547023, 3328846821, 'state1', 'time1'),)
+inderect_offers = (('alaclcdcsdcscscsdjcs', None, 1, 76561198311547023, 3328846821, 'state2', 'time2'),)
