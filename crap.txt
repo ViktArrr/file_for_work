@@ -1,3 +1,23 @@
+"AlCoreTV": {
+        "Count trades": 1393, 
+        "Count users": 2429, 
+        "Value": 453.07, 
+        "g2a": 0.00, 
+        "g2a/user": 0.00, 
+        "secondary_trades": 76, 
+        "secondary_users": 168, 
+        "secondary_value": 23.10, 
+        "the_final_total": 476.17, 
+        "the_final_trades": 1469, 
+        "the_final_users": 2597
+      }
+
+
+
+
+
+file testt.py
+
 # -*- coding: utf-8 -*-
 
 from collections import defaultdict
