@@ -12,8 +12,9 @@ bytesarray(bytes) -> bytesarray(bytes, "utf-8")
 class Class(object) -> class Class:
 for i in d.keys(): -> for i in list(d):
 iteritems() -> items()
-
-
+encode и decode utf 8 не нужны больше
+StringIO + cStringIO -> io
+from exceptions import Exception -> from builtins import Exception
 
 
 PY_VERSION = sys.version_info[0]

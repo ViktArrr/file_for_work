@@ -1,0 +1,7 @@
+можно запустить командой python -m unittest discover, тогда цитата "Это приведет к запуску всех модулей test*.py внутри пакета test"
+
+примечание, важно что бы питон был 3 а не 2
+
+python -m pytest
+
+C:\Users\iRU\AppData\Local\Programs\Python\Python37\python.exe -m pytest

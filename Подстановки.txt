@@ -17,3 +17,43 @@ selected_offers = ((76561198337508335, 1, 'Poland_Panda', 3334282822),)
 Чек
 direct_offers = (('alaclcdcsdcscscsdjcs', None, 1, 76561198311547023, 3328846821, 'state1', 'time1'),)
 inderect_offers = (('alaclcdcsdcscscsdjcs', None, 1, 76561198311547023, 3328846821, 'state2', 'time2'),)
+
+тест_рефки
+offers_date = (('76561198111358816', datetime.datetime(2017, 2, 17, 17, 26, 48)), ('76561198111358816', datetime.datetime(2017, 2, 19, 5, 19, 44)), ('5', datetime.datetime(2017, 2, 19, 18, 28, 6)))
+
+апи функция send_offer
+data = {
+    'onWallet': '-0.170',
+    'force_virtual': '1',
+    'skins': '{\\"bot\\":{\\"76561198809900590\\":{\\"15044802284\\":{\\"price\\":0,\\"appid\\":\\"730\\",\\"float\\":0.0445455201,\\"reality\\":\\"physical\\"},\\"15044802285\\":{\\"price\\":0,\\"appid\\":\\"570\\",\\"float\\":0.0445455201,\\"reality\\":\\"physical\\"},\\"15044802286\\":{\\"price\\":0,\\"appid\\":\\"570\\",\\"float\\":0.0445455201,\\"reality\\":\\"physical\\"}}},\\"partner\\":{\\"76561198176718195\\":{}}}',
+    'bonus_status': '1',
+    'key': 'BltkkS4Jt2dPahB',
+    'appid': '730'
+}
+skins = '{\\"partner\\":{\\"76561198176718195\\":{}},\\"bot\\":{\\"76561198809938336\\":{\\"14971074010\\":{\\"price\\":0,\\"float\\":0.2984898984,\\"reality\\":\\"physical\\",\\"appid\\":\\"730\\"}}}}'
+
+апи функция confirm_virtual_offer
+data = {
+    'onWallet': '-9.170',
+    'force_virtual': '1',
+    'skins': '{\\"bot\\":{\\"76561198310179448\\":{\\"13241012048\\":{\\"price\\":0,\\"appid\\":\\"730\\",\\"float\\":0.7799792886,\\"reality\\":\\"physical\\"},\\"132410120489\\":{\\"price\\":0,\\"appid\\":\\"570\\",\\"float\\":0.0445455201,\\"reality\\":\\"physical\\"},\\"13241012050\\":{\\"price\\":0,\\"appid\\":\\"570\\",\\"float\\":0.0445455201,\\"reality\\":\\"physical\\"}}},\\"partner\\":{\\"76561198176718195\\":{}}}',
+    'bonus_status': '1',
+    'key': 'BltkkS4Jt2dPahB',
+    'appid': '730',
+    'action': "confirm",
+    'offer_id': "95886345",
+    'steamid64': "76561198338806655"
+}
+
+Утилитес
+url = 'http://127.0.0.1:5000/api/2.0/send_offer/'
+url = 'http://127.0.0.1:5000/api/1.0/confirm_virtual_offer/'
+
+a.try_again_v2('111187340')
+a.try_again_v2('97384602')
+
+Апи реферерс для быстрого теста
+offers_date = (('105', datetime(2017, 2, 17, 17, 26, 48)),
+('105', datetime(2017, 2, 19, 5, 19, 44)),
+('5', datetime(2017, 2, 19, 18, 28, 6)),
+('28', datetime(2017, 2, 19, 18, 28, 6)))

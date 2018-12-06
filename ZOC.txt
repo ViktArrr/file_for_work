@@ -5,7 +5,7 @@ sudo python3.7 -m pip install ujson установка пипом на разн�
 sudo ln -sf python3 /usr/bin/python смена версии питона
 
 sudo nano редактор файла
-sudo rm удалить файл
+sudo rm -f удалить файл
 
 заливаешь новые файлы методом исправления конфигов, потом надо написать:
 sudo supervisorctl reread
@@ -19,11 +19,14 @@ cat /etc/supervisor/conf.d/check_offers.conf
 cat /etc/supervisor/conf.d/check_sent_offers.conf
 
 ls -la /var/log/supervisor/
-tail -f /var/log/supervisor/new_send_offers.err.log
-tail -f /var/log/supervisor/new_confirm_offers.err.log
-tail -f /var/log/supervisor/new_check_offers.err.log
-tail -f /var/log/supervisor/new_accept_offers.err.log
-tail -f /var/log/supervisor/new_check_sent_offers.err.log
+tail -f /var/log/supervisor/send_offers.err.log
+tail -f /var/log/supervisor/confirm_offers.err.log
+tail -f /var/log/supervisor/check_offers.err.log
+tail -f /var/log/supervisor/accept_offers.err.log
+tail -f /var/log/supervisor/check_sent_offers.err.log
+tail -f /var/log/supervisor/api.err.log
+
+less /var/log/supervisor/new_send_offers.err.log | grep wrong
 
 less просматривает файл в прошлом
 tail просматривает файл в настоящем
@@ -47,6 +50,17 @@ startretries=10800
 user=pavel
 stderr_logfile=/var/log/supervisor/new_send_offers.err.log
 stdout_logfile=/var/log/supervisor/new_send_offers.out.log
+stopasgroup=true
+
+[program:api]
+directory=/home/pavel/trader
+command=gunicorn --bind 1
+autorestart=true
+startretries=10800
+user=pavel
+stderr_logfile_maxbytes=1GB
+stderr_logfile=/var/log/supervisor/api.err.log
+stdout_logfile=/var/log/supervisor/api.out.log
 stopasgroup=true
 
 ls -l /usr/bin/ | grep python3.

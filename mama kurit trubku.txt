@@ -1,0 +1,21 @@
+Что бы всё зааксептить на аккаунте
+Шаблон:
+http://moyamamakyrittrubku.com/api/1.0/Z395uxTt5iFV9kF/ЛОГИН/accept/
+Пример:
+http://moyamamakyrittrubku.com/api/1.0/Z395uxTt5iFV9kF/logitech_not_best/accept/
+
+Что бы получить ключ аутентификации
+Шаблон:
+http://moyamamakyrittrubku.com/api/1.0/Z395uxTt5iFV9kF/ЛОГИН/key/
+Пример:
+http://moyamamakyrittrubku.com/api/1.0/Z395uxTt5iFV9kF/logitech_not_best/key/
+
+Чек статы
+http://moyamamakyrittrubku.com/api/1.0/get_economic_statistic
+
+Чек реферов
+http://csgonow.xyz/referrers/referrers_statistic
+
+Синхронизирует инвентарь стима и записи в бд inventories
+http://inventory.moyamamakyrittrubku.com/user/get_user_inventory/?appid=570&steamid64=76561198337508335
+
