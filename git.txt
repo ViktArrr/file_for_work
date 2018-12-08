@@ -1,3 +1,5 @@
+Старт работы с гитом:
+
 echo "# file_for_work" >> README.md
 git init
 git add README.md
@@ -6,3 +8,10 @@ git remote add origin https://github.com/ViktArrr/file_for_work.git
 git push -u origin master
 
 git branch --set-upstream-to=origin/master
+
+
+git branch         |Просмотр всех веток
+git checkout <>    |Смена ветки
+git push           |Залить изменения в мастер
+git pull           |Скачать изменения из мастера
+git reset HEAD~    |Удалить последний коммит

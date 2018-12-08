@@ -19,3 +19,5 @@ http://csgonow.xyz/referrers/referrers_statistic
 Синхронизирует инвентарь стима и записи в бд inventories
 http://inventory.moyamamakyrittrubku.com/user/get_user_inventory/?appid=570&steamid64=76561198337508335
 
+Сходится ли баланс:
+http://csgonow.xyz/check_user_balance?steamid64=76561198077768244
