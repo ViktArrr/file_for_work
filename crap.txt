@@ -1,215 +1,1766 @@
-мэнэйдж каунт айтэмс
+from steam.others import Database
+from collections import defaultdict
 
+# dota_referals = ['Agro1', 'Agro2', 'AgroMorp', 'AlCore', 'AlCoreTV', 'Alex', 'Anthony', 'Anthony1', 'Anthony2', 'Anthony3', 'AnthonyS', 'Azazin', 'Balan', 'Banana', 'BestPapa', 'BFHG', 'BG', '1bloomy', 'Boroda1', 'Boroda2', 'Boroda3', 'Boroda4', 'Boroda4G', 'Caetano', 'Cealdre', 'Cealdre1', 'chiwa', 'Cropson', 'D7MAS', 'DarkS', 'DarkS1', 'DarkS2', 'DarkSaru', 'Dota2FY', 'Dota2S', 'DotaLife', 'Filipin1', 'Fir3z', 'Forever', 'Gery', 'GGuma', 'GGuma1', 'GGuma2', 'GGuma3', 'GGuma4', 'GGuma5', 'Jessie', 'JQ', 'Juaum', 'juicy', 'KiFi', 'kodcup', 'Landstop', 'M9snik1', 'MetaGame', 'Misi1', 'Misi2', 'Misisipi', 'oKeyush', 'Olyashaa', 'Panda', 'Panda1', 'Panda2', 'PlaySixx', 'Raiz', 'Ruha', 'Samovar', 'Samovar1', 'Samovar2', 'SHIMORO1', 'Slapick', 'Slapick1', 'Slidan', 'SPul', 'stint', 'Sweet', 'Tibur', 'tiburci0', 'Toddynho', 'TopPapi4', 'Trasher', 'Trasher1', 'TRASHER2', 'TRASHER3', 'TwDLife', 'Uley', 'Unfor', 'Unforget', 'Unlostv', 'VERTIGO', 'warwar1', 'ZeboPL1', 'ZeDDy', 'zloendv2', 'zlov2', 'zlov3', 'zlov4', 'zlov7', 'zloveng1', 'Zoeira', 'Guri', 'Guri1', 'Gguma6', 'Borodach', 'zloNYen', 'zloNYru', 'Misi3', 'Misi4', 'Panda3', 'Panda4', 'Panda5', 'Panda6', 'joombler', 'Analitik', 'Analit1', 'samovar3']
+# dota_referalsss = ', '.join([f"'{referals}'" for referals in dota_referals])
+temp = {'14': '96', '56': '128', '28': '105', '90': '163', '32': '109', '7': '93', '30': '107', '5': '91', '6': '92', '54': '127', '34': '110', '27': '104', '93': '192', '68': '143', '36': '114', '19': '99', '24': '101', '11': '197', '86': '158', '37': '113', '8': '94', '95': '198', '88': '159', '10': '86', '69': '144', '26': '102', '17': '98', '35': '112', '1': '81', '70': '145', '2': '82', '12': '88', '4': '13', '21': '100', '77': '106', '42': '119', '38': '116', '3': '2', '9': '95', '41': '117', '89': '160', '92': '166', '15': '97', '33': '111', '85': '157', '46': '123', '65': '130', '97': '191', '45': '120', '47': '855', '48': '856', '16': '824', '23': '831', '25': '833', '64': '872', '63': '871', '60': '868', '82': '890', '83': '891', '94': '902', '76': '884', '55': '863', '49': '857', '81': '889', '84': '892', '96': '904', '58': '866', '66': '874', '71': '879', '72': '880', '73': '881', '74': '882', '75': '883', '61': '869', '67': '875', '52': '860', '53': '861', '79': '887', '50': '858', '51': '859', '87': '895', '29': '837', '43': '851', '44': '852', '59': '867', '78': '886', '20': '828', '22': '830', '39': '847', '40': '848', '80': '888', '57': '865', '62': '870', '13': '821', '98': '906', '18': '826', '31': '839', '91': '899', '99': '907', '100': '908', '101': '909', '102': '910', '103': '911', '104': '912', '105': '913', '106': '914', '107': '915', '108': '916', '109': '917', '110': '918', '111': '919', '112': '920', '113': '921', '114': '922', '115': '923'}
+
+with Database(max_retry_query=1, commit=False) as database:
+    dota_log = database.query(
+        "SELECT referral, referrer, time "
+        "FROM dotamoney.referrals_log",
+        withoutCommit=True
+    )
+
+    data_for_insert_to_log = defaultdict(list)
+
+    for referral, referrer, time in dota_log:
+        data_for_insert_to_log[referrer].append((referral, time))
+
+    new = {}
+    for dota_steamid64, csgo_steamid64 in temp.items():
+
+        if data_for_insert_to_log.get(int(dota_steamid64)):
+            transaction_data = data_for_insert_to_log.pop(int(dota_steamid64))
+            new[csgo_steamid64] = transaction_data
+
+# count = 0
+# for _, data in new.items():
+#     count += len(data)
+
+    # csgo_code = database.query(
+    #     f"SELECT steamid64, code "
+    #     f"FROM csgomoney.referrers "
+    #     f"WHERE code IN ({dota_referalsss})",
+    #     withoutCommit=True
+    # )
+    #
+    # dota_code = database.query(
+    #     f"SELECT steamid64, code "
+    #     f"FROM dotamoney.referrers "
+    #     f"WHERE code IN ({dota_referalsss})",
+    #     withoutCommit=True
+    # )
+    #
+    # dotaas = {}
+    # for steamid64, code in dota_code:
+    #     dotaas[code] = steamid64
+    #
+    # steamid64_changes = {}
+    # for steamid64, code in csgo_code:
+    #     if code == 'Cealdre1':
+    #         pass
+    #     steamid64_changes[dotaas[code]] = steamid64
+
+with Database() as database:
+    try:
+        for referrer, data in new.items():
+            for da in data:
+
+                try:
+                    referral, time = da
+
+                    database.query(
+                        f"INSERT INTO csgomoney.referrals_log (referral, referrer, time) "
+                        f"VALUES({referral}, {referrer}, '{time}')",
+                        withoutCommit=True
+                    )
+
+                except Exception as e:
+                    print(e)
+                    pass
+
+    except Exception as e:
+        print(e)
+        database.rollback()
+
+    database.commit()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\
 # -*- coding: utf-8 -*-
+""""""
+from steam.others import Database
 
-"""
-Модуль отслеживает количество предметов на dota.money аккаунтах. Чистит в случае переполнения оных.
-Также перносит предметы, которые стали недоступны (unavailable) для обмена на сайте.
+with Database() as database:
+    value = database.query(
+        "SELECT value "
+        "FROM csgomoney.variables "
+        "WHERE variable='inventories' "
+        "LIMIT 1"
+    )
 
-"""
-import logging
-import time
-import traceback
-from argparse import ArgumentParser
+dota_referals = ['Agro1', 'Agro2', 'AgroMorp', 'AlCore', 'AlCoreTV', 'Alex', 'Anthony', 'Anthony1', 'Anthony2', 'Anthony3', 'AnthonyS', 'Azazin', 'Balan', 'Banana', 'BestPapa', 'BFHG', 'BG', '1bloomy', 'Boroda1', 'Boroda2', 'Boroda3', 'Boroda4', 'Boroda4G', 'Caetano', 'Cealdre', 'Cealdre1', 'chiwa', 'Cropson', 'D7MAS', 'DarkS', 'DarkS1', 'DarkS2', 'DarkSaru', 'Dota2FY', 'Dota2S', 'DotaLife', 'Filipin1', 'Fir3z', 'Forever', 'Gery', 'GGuma', 'GGuma1', 'GGuma2', 'GGuma3', 'GGuma4', 'GGuma5', 'Jessie', 'JQ', 'Juaum', 'juicy', 'KiFi', 'kodcup', 'Landstop', 'M9snik1', 'MetaGame', 'Misi1', 'Misi2', 'Misisipi', 'oKeyush', 'Olyashaa', 'Panda', 'Panda1', 'Panda2', 'PlaySixx', 'Raiz', 'Ruha', 'Samovar', 'Samovar1', 'Samovar2', 'SHIMORO1', 'Slapick', 'Slapick1', 'Slidan', 'SPul', 'stint', 'Sweet', 'Tibur', 'tiburci0', 'Toddynho', 'TopPapi4', 'Trasher', 'Trasher1', 'TRASHER2', 'TRASHER3', 'TwDLife', 'Uley', 'Unfor', 'Unforget', 'Unlostv', 'VERTIGO', 'warwar1', 'ZeboPL1', 'ZeDDy', 'zloendv2', 'zlov2', 'zlov3', 'zlov4', 'zlov7', 'zloveng1', 'Zoeira', 'Guri', 'Guri1', 'Gguma6', 'Borodach', 'zloNYen', 'zloNYru', 'Misi3', 'Misi4', 'Panda3', 'Panda4', 'Panda5', 'Panda6', 'joombler', 'Analitik', 'Analit1', 'samovar3']
+dota_referalsss = ', '.join([f"'{referals}'" for referals in dota_referals])
 
-from exchange import Exchange
-from inventory.inventory import inventory_wrapper
-from item_types import ItemType
-from others import Database
-from steam.shared import fetch_waiting_assets, DOTA_APPID
-from validation.validation import Validation
+temp = {'14': '96', '56': '128', '28': '105', '90': '163', '32': '109', '7': '93', '30': '107', '5': '91', '6': '92', '54': '127', '34': '110', '27': '104', '93': '192', '68': '143', '36': '114', '19': '99', '24': '101', '11': '197', '86': '158', '37': '113', '8': '94', '95': '198', '88': '159', '10': '86', '69': '144', '26': '102', '17': '98', '35': '112', '1': '81', '70': '145', '2': '82', '12': '88', '4': '13', '21': '100', '77': '106', '42': '119', '38': '116', '3': '2', '9': '95', '41': '117', '89': '160', '92': '166', '15': '97', '33': '111', '85': '157', '46': '123', '65': '130', '97': '191', '45': '120', '47': '855', '48': '856', '16': '824', '23': '831', '25': '833', '64': '872', '63': '871', '60': '868', '82': '890', '83': '891', '94': '902', '76': '884', '55': '863', '49': '857', '81': '889', '84': '892', '96': '904', '58': '866', '66': '874', '71': '879', '72': '880', '73': '881', '74': '882', '75': '883', '61': '869', '67': '875', '52': '860', '53': '861', '79': '887', '50': '858', '51': '859', '87': '895', '29': '837', '43': '851', '44': '852', '59': '867', '78': '886', '20': '828', '22': '830', '39': '847', '40': '848', '80': '888', '57': '865', '62': '870', '13': '821', '98': '906', '18': '826', '31': '839', '91': '899', '99': '907', '100': '908', '101': '909', '102': '910', '103': '911', '104': '912', '105': '913', '106': '914', '107': '915', '108': '916', '109': '917', '110': '918', '111': '919', '112': '920', '113': '921', '114': '922', '115': '923'}
 
+with Database(max_retry_query=1, commit=False) as database:
+    dota_refferers = database.query(
+        "SELECT steamid64, code, offers_wallet, g2a_wallet, secondary_wallet "
+        "FROM dotamoney.referrers",
+        withoutCommit=True
+    )
 
-class StorageNotFound(Exception):
-    pass
+    steamid64_changes = {}
+    data_for_insert_to_referrers = []
+    data_for_update_to_referrers = {}
 
-
-class Account(object):
-    def __init__(self, steamid, steamid64, tradelink):
-        self.steamid = steamid
-        self.steamid64 = steamid64
-        self.tradelink = tradelink
-
-
-class Storage(object):
-    count_items_limit = 8000
-    wealthy_limit = 8000
-
-    def __init__(self, steamid, count_items, wealthy):
-        self.steamid = steamid
-        self.count_items = count_items
-        self.wealthy = wealthy
-
-
-    def __repr__(self):
-        return "steamid={} count_items={} wealthy={}".format(self.steamid, self.count_items, self.wealthy)
-
-
-    def __gt__(self, other):
-        return self.count_items + self.wealthy > other.count_items + other.wealthy
-
-
-    def add_items(self, additional_items, additional_wealthy):
-        self.count_items += additional_items
-        self.wealthy += int(additional_wealthy)
-
-
-def _fetch_storages():
-    with Database() as database:
-        trashmans = database.query(
-            "SELECT steamid64, steamid, money "
-            "FROM state.control "
-            "WHERE work=5 AND game='Dota' AND state='Trashman' AND money<{}  "
-            "".format(Storage.wealthy_limit)
+    for steamid64, code, offers_wallet, g2a_wallet, secondary_wallet, in dota_refferers:
+        csgo_code = database.query(
+            f"SELECT steamid64, offers_wallet, g2a_wallet, secondary_wallet "
+            f"FROM csgomoney.referrers "
+            f"WHERE code='{code}'",
+            withoutCommit=True
         )
-        trashmans_frm = ", ".join([str(steamid64) for steamid64, _, _ in trashmans])
 
-        # Не используем HAVING, потому что пустые трешмены тоже должны быть получены
-        storage_items_rate = database.query(
-            "SELECT steamid64,COUNT(*) as cnt "
-            "FROM inventories.`570` "
-            "WHERE steamid64 IN ({}) "
-            "GROUP BY steamid64 "
-            "ORDER BY cnt ASC".format(trashmans_frm)
-        )
-        storage_items_rate = {str(steamid64): count_items for steamid64, count_items in storage_items_rate}
+        if csgo_code:
+            steamid64_cs, offers_wallet_cs, g2a_wallet_cs, secondary_wallet_cs = csgo_code[0]
 
-    storages = []
-    for steamid64, steamid, wealthy in trashmans:
-        count_items = storage_items_rate.get(steamid64, 0)
-        if count_items < Storage.count_items_limit:
-            storages.append(Storage(steamid, count_items, wealthy))
+            if steamid64 != steamid64_cs:
+                steamid64_changes[steamid64] = steamid64_cs
 
-    storages.sort()
-    return storages
-
-
-def choose_storage(count_transfer, storages=None, additional_wealthy=0.0):
-    if not storages:
-        storages = _fetch_storages()
-
-    count_transfer = min(count_transfer, Limits.count_items_per_offer * Limits.max_count_offers)
-
-    for storage in storages:
-        if storage.count_items + count_transfer <= Storage.count_items_limit:
-            storage.add_items(count_transfer, additional_wealthy)
-            chosen_steamid = storage.steamid
-            break
-    else:
-        raise StorageNotFound("Not found free storage for count_transfer={}".format(count_transfer))
-
-    storages.sort()
-    return chosen_steamid
-
-
-
-class Limits(object):
-    items_limit = 4000
-    count_items_per_offer = 30
-    additional_cleanup = 250
-    max_count_offers = 5
-
-
-    def __init__(self):
-        self.appid = DOTA_APPID
-        self.storages = list()
-
-        self.database = Database(commit=True)
-        self.exchange = Exchange()
-        self.inventory = inventory_wrapper({'appid': self.appid})  # Кешируем тяжелый объект
-        self.validation = Validation()
-
-
-    def manage_inventory(self, account):
-        logging.info("Manage inventory steamid={}".format(account.steamid))
-        self.inventory.set_steamid64(account.steamid64)
-        self.inventory.get_any_inventory_by_proxies()
-
-        self.inventory.insert_into_mysql()
-        self.inventory.insert_into_postgresql()
-
-        self.inventory.remove_hidden_assets()
-
-
-    def choose_assets(self, count_transfer):
-        waiting_assetids = fetch_waiting_assets(self.inventory.steamid64, database=self.database, appid=self.appid)
-        assets, unavaiables_counter = {}, 0
-
-        for assetid, item_data in self.inventory.get_inventory().items():
-            if assetid not in waiting_assetids:
-                if item_data['rate'] == ItemType.unavailable:
-                    unavaiables_counter += 1
-
-                price = round(item_data['price'], 2)
-                assets.update({assetid: price})
-
-        require_transfer = unavaiables_counter
-        if count_transfer > 0:
-            require_transfer += count_transfer + Limits.additional_cleanup
-
-        assets = sorted(assets.items(), key=lambda x: x[1])[:require_transfer]
-        total_price = sum(price for assetid, price in assets)
-
-        return [str(assetid) for assetid, price in assets], total_price
-
-
-    def manage_count_items(self, account):
-        """Если количество скинов на ботах приемлимое, просто проверяем на unavailable."""
-        require_transfer = max(self.inventory.get_count_items() - Limits.items_limit, 0)
-
-        account_assets, additional_wealthy = self.choose_assets(require_transfer)
-
-        if account_assets:
-            storage_steamid = choose_storage(require_transfer, self.storages, additional_wealthy)
-            logging.info("Transfer count_skins={} storage={}".format(len(account_assets), storage_steamid))
-
-            kwargs = {
-                "appid": self.appid,
-                "count_items_per_offer": Limits.count_items_per_offer,
-                "steamid_from": storage_steamid,
-                "steamid_to": account.steamid,
-                "items_from": [],
-                "items_to": ["{}:{}".format(DOTA_APPID, assetid) for assetid in account_assets[:(Limits.count_items_per_offer * Limits.max_count_offers)]],
-                "tradelink": account.tradelink,
-                "steamid64_to": account.steamid64
-            }
-
-            try:
-                self.exchange.multiple_make_exchange(**kwargs)
-            except AttributeError:
-                logging.exception(traceback.format_exc())
-
-
-    def get_accounts(self):
-        with Database(commit=True) as database:
-            accounts = database.query(
-                "SELECT steamid,steamid64,tradelink "
-                "FROM state.control "
-                "WHERE work=5 AND state='Dotamoney' AND stateTrader>0 "
-                "ORDER BY id ASC "
-            )
-
-        return [Account(*args) for args in accounts]
-
-
-    def run(self):
-        for account in self.get_accounts():
-            try:
-                self.manage_inventory(account)
-            except Exception:
-                logging.exception(traceback.format_exc())
-                continue
-
-            self.manage_count_items(account)
+            data_for_update_to_referrers[code] = (offers_wallet + offers_wallet_cs, g2a_wallet + g2a_wallet_cs, secondary_wallet + secondary_wallet_cs)
 
         else:
-            time.sleep(60 * 4)
+            steamid64_new = int(steamid64) + 808
+            steamid64_changes[steamid64] = str(steamid64_new)
+            data_for_insert_to_referrers.append((code, str(steamid64_new), offers_wallet, g2a_wallet, secondary_wallet))
+
+    dota_transaction = database.query(
+        "SELECT merchant_id, referral, referrer, dPrice, percent, earn, secondary, source, time "
+        "FROM dotamoney.referrals_transactions",
+        withoutCommit=True
+    )
+
+    dota_log = database.query(
+        "SELECT referral, referrer, time "
+        "FROM dotamoney.referrals_log",
+        withoutCommit=True
+    )
+
+    # dota_clicks = database.query(
+    #     "SELECT referrer, referral, date "
+    #     "FROM dotamoney.referrals_clicks",
+    #     withoutCommit=True
+    # )
+    #
+    # dota_referrals = database.query(
+    #     "SELECT steamid64, referrer, percent, date "
+    #     "FROM dotamoney.referrals",
+    #     withoutCommit=True
+    # )
+
+    # # проверить рефералов на дубли
+    # delete_referrals = database.query(
+    #     "SELECT tb1.steamid64 "
+    #     "FROM csgomoney.referrals as tb1 "
+    #     "LEFT JOIN dotamoney.referrals as tb2 ON tb1.steamid64=tb2.steamid64 "
+    #     "WHERE tb1.steamid64=tb2.steamid64",
+    #     withoutCommit=True
+    # )
+    #
+    # delete_referrals = [steamid64[0] for steamid64 in delete_referrals]
+
+    data_for_insert_to_transaction = {}
+    data_for_insert_to_log = {}
+    # data_for_insert_to_clicks = {}
+    # data_for_insert_to_referrals = {}
+
+    for merchant_id, referral, referrer, d, percent, earn, secondary, source, time in dota_transaction:
+        data_for_insert_to_transaction[referrer] = (merchant_id, referral, d, percent, earn, secondary, source, time)
+
+    for referral, referrer, time in dota_log:
+        data_for_insert_to_log[referrer] = (referral, time)
+
+    # for referrer, referral, date in dota_clicks:
+    #     data_for_insert_to_clicks[referrer] = (referral, date)
+    #
+    # for steamid64, referrer, percent, date in dota_referrals:
+    #     if int(steamid64) in delete_referrals:
+    #         continue
+    #     data_for_insert_to_referrals[referrer] = (steamid64, percent, date)
+
+    for dota_steamid64, csgo_steamid64 in steamid64_changes.items():
+
+        if data_for_insert_to_transaction.get(dota_steamid64):
+            transaction_data = data_for_insert_to_transaction.pop(dota_steamid64)
+            data_for_insert_to_transaction.update({csgo_steamid64: transaction_data})
+
+        if data_for_insert_to_log.get(dota_steamid64):
+            log_data = data_for_insert_to_log.pop(dota_steamid64)
+            data_for_insert_to_log.update({csgo_steamid64: log_data})
+
+    #     if data_for_insert_to_clicks.get(dota_steamid64):
+    #         clicks_data = data_for_insert_to_clicks.pop(dota_steamid64)
+    #         data_for_insert_to_clicks.update({csgo_steamid64: clicks_data})
+    #
+    #     if data_for_insert_to_referrals.get(dota_steamid64):
+    #         referrals_data = data_for_insert_to_referrals.pop(dota_steamid64)
+    #         data_for_insert_to_referrals.update({csgo_steamid64: referrals_data})
+
+with Database() as database:
+    try:
+        # for code, steamid64, offers_wallet, g2a_wallet, secondary_wallet in data_for_insert_to_referrers:
+        #     database.query(
+        #         f"INSERT INTO csgomoney.referrers (steamid64, code, offers_wallet, g2a_wallet, secondary_wallet) "
+        #         f"VALUES('{steamid64}', '{code}', {offers_wallet}, {g2a_wallet}, {secondary_wallet})",
+        #         withoutCommit=True
+        #     )
+        #
+        # for code, data in data_for_update_to_referrers.items():
+        #     offers_wallet, g2a_wallet, secondary_wallet = data
+        #
+        #     database.query(
+        #         f"UPDATE csgomoney.referrers SET offers_wallet={offers_wallet}, g2a_wallet={g2a_wallet}, secondary_wallet={secondary_wallet} "
+        #         f"WHERE code='{code}'",
+        #         withoutCommit=True
+        #     )
+
+        for referrer, data in data_for_insert_to_transaction.items():
+            merchant_id, referral, d, percent, earn, secondary, source, time = data
+
+            database.query(
+                f"INSERT INTO csgomoney.referrals_transactions (merchant_id, referral, referrer, dPrice, percent, earn, secondary, source, time) "
+                f"VALUES({merchant_id}, {referral}, {referrer}, {d}, {percent}, {earn}, {secondary}, '{source}', '{time}')",
+                withoutCommit=True
+            )
+
+        for referrer, data in data_for_insert_to_log:
+            referral, time = data
+
+            database.query(
+                "INSERT INTO csgomoney.referrals_log (referral, referrer, time) "
+                "VALUES(referral, referrer, time)",
+                withoutCommit=True
+            )
+
+        # for referrer, data in data_for_insert_to_clicks:
+        #     referral, date = data
+        #
+        #     database.query(
+        #         "INSERT INTO csgomoney.referrals_clicks (referral, referrer, date) "
+        #         "VALUES(referrer, referrer, date)",
+        #         withoutCommit=True
+        #     )
+        #
+        # for referrer, data in data_for_insert_to_referrals:
+        #     steamid64, percent, date = data
+        #
+        #     database.query(
+        #         "INSERT INTO csgomoney.referrals (steamid64, referrer, percent, date) "
+        #         "VALUES(steamid64, referrer, percent, date)",
+        #         withoutCommit=True
+        #     )
+
+    except Exception as e:
+        print(e)
+        database.rollback()
+
+    database.commit()
 
 
 
 if __name__ == '__main__':
-    parser = ArgumentParser()
-    parser.add_argument("appid", choices=[DOTA_APPID], type=int, help="Steam game id")
-    parser.parse_args()
+    pass
 
-    Limits().run()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# -*- coding: utf-8 -*-
+"""
+Отправка данных на фронтэнд через ретранслятор.
+
+"""
+import copy
+import logging
+import os
+import time
+import traceback
+import ujson
+from collections import defaultdict, OrderedDict
+from datetime import datetime
+from multiprocessing import Process
+
+import requests
+
+try:
+    import MySQLdb
+except ImportError:
+    import pymysql as MySQLdb
+    MySQLdb.install_as_MySQLdb()
+
+import api
+from steam.others import Database
+from validation.validation import Validation
+
+from steam.shared import fetch_steamid, CSGO_APPID, DOTA_APPID
+from validation.utilities import Utilities
+
+ERRORS_ON_VALIDATION = ['Refresh inventory', 'Our Problem', 'Escrow disabled', 'Update tradelink', 'Trade Ban',
+                        'User ban', 'Trade Ban', 'Wrong Prices']
+
+ERRORS_ON_SEND_OFFER = ['Error', 'Profile Settings', 'Our Problem', 'Trade Ban', 'Bot Overflow', 'Update tradelink',
+                        'Unknown error', 'Trade Offers Limit', 'Game Server Down', 'Escrow disabled']
+
+ACCEPT_STATE = "Accept"
+WAITING = "Waiting"
+MOBILE_CONFIRMATION = "Mobile confirmation"
+SEND_OFFER = "Send offer"
+SEND_ERROR = "Send error"
+VALIDATION_OFFER = "Validation offer"
+VALIDATION_ERROR = "Validation error"
+GET_OFFER = "Get offer"
+
+USER_CONFIRMATION = "User confirmation"
+AWAITING_OFFER = "Awaiting Offer"
+AWAITING_VIRTUAL_OFFER = "Awaiting Virtual Offer"
+DECLINE_MAIN_OFFER = "Decline Main Offer"
+
+AWAITING_PAYMENT = "Awaiting payment"
+
+DEBUG = not bool(os.getenv('SERVER', None))
+
+
+
+
+
+
+
+
+def run_notification(class_name):
+    """
+    Запускает работу нотификаций.
+
+    @param class_name: Имя нотификации.
+
+    """
+    class_name().run()
+
+
+
+
+
+
+
+
+
+
+def logger_initialization():
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG)
+    return logger
+
+
+LOGGER = logger_initialization()
+
+
+def make_request(kwargs):
+    if DEBUG:
+        LOGGER.info(ujson.dumps(kwargs))
+    else:
+        LOGGER.info(ujson.dumps(kwargs))
+        data = {'message': ujson.dumps(kwargs), 'secret': "dn3FLfK1481nx"}
+        try:
+            requests.post(url="http://54.38.19.201:5000/new_step", data=data)
+        except requests.exceptions.RequestException as e:
+            LOGGER.exception("Exception: {}".format(e))
+
+
+def fetch_case_hardened():
+    with Database(commit=True) as database:
+        database.cursor = database.db.cursor(MySQLdb.cursors.DictCursor)
+        names = database.query("SELECT name,id as name_id FROM goods.skin_names WHERE name LIKE '%Case Hardened%'")
+        names = {skin["name"]: skin["name_id"] for skin in names}
+
+        case_hardened = database.query(
+            "SELECT name,pattern_index,playside,backside "
+            "FROM patterns.case_hardened "
+            "ORDER BY id ASC"
+        )
+
+    patterns = defaultdict(dict)
+    for kwargs in case_hardened:
+        patten_sides = {"playside": kwargs['playside'], "backside": kwargs['backside']}
+        patterns[kwargs['name']].update({kwargs['pattern_index']: patten_sides})
+
+    skins = {}
+    for name, name_id in names.items():
+        part_name = name.replace(u"StatTrak™ ", "").split(" | ", 1)[0]
+        skins.update({name_id: patterns[part_name]})
+
+    return skins
+
+
+def get_rate(steam_type, price, appid, name_id):
+
+    # Совместимость при релизе
+    rates = OfferNotification.validation_rates[int(appid)]
+    if rates.get(appid):
+        rates = rates[appid]
+
+    return rates[OfferNotification.rate_data[name_id]]['partner']
+
+
+def define_blue_percents(skin, case_hardened):
+    skins_sides = case_hardened.get(skin["name_id"])
+    if skins_sides is not None:
+        skin_sides = skins_sides.get(skin["patternindex"])
+        if skin_sides is not None:
+            skin.update({"blue_percents": skin_sides})
+
+
+class Node(object):
+    """Узел графа."""
+
+    def __init__(self,
+                 state,
+                 children_left=None,
+                 children_right=None,
+                 awaiting_offer=None,
+                 awaiting_virtual_offer=None,
+                 awaiting_payment=None,
+                 decline_main_offer=None,
+                 errors=None):
+
+        self.state = state
+        self.children_left = children_left
+        self.children_right = children_right  # Ошибочный степ проверяемый по self.errors
+        self.awaiting_offer = awaiting_offer
+        self.awaiting_virtual_offer = awaiting_virtual_offer
+        self.awaiting_payment = awaiting_payment
+        self.decline_main_offer = decline_main_offer
+
+        self.errors = errors or []
+
+
+    def __str__(self):
+        return "State='{}'".format(self.state)
+
+
+    def get_current_state(self):
+        return self.state
+
+
+    def is_last(self):
+        return self.children_left is None and self.children_right is None
+
+
+    def is_error(self, state_base):
+        return state_base in self.errors
+
+
+    def sorting_offers_by_main(self, offer):
+        main_offer = offer.get("main_offer")
+        if main_offer == 1:
+            return 1
+        elif main_offer is not None:
+            return 2
+        return 3
+
+
+    def send(self, node_state, requests_data, offer_data):
+        step_kwargs = {}
+
+        if node_state == SEND_ERROR:
+            message = offer_data['error'] or offer_data['state']
+
+            step_kwargs = {
+                "message": message,
+                "error_code": api.convert_error_to_code(message),
+                "uniqid": requests_data['request_id'],
+                "step": SEND_OFFER,
+                "balance": requests_data['balance'],
+                "method": offer_data['method'],
+                "offer_id": offer_data["offer_id"]
+            }
+
+        elif node_state == VALIDATION_ERROR:
+            step_kwargs = {
+                "success": False,
+                "message": requests_data['state'],
+                "error_code": api.convert_error_to_code(requests_data['state']),
+                "uniqid": requests_data['request_id'],
+                "step": VALIDATION_OFFER,
+                "callback": requests_data['callback']
+            }
+
+        elif node_state == DECLINE_MAIN_OFFER:
+            step_kwargs = {
+                "uniqid": requests_data['request_id'],
+                "step": "user_response",
+                "message": DECLINE_MAIN_OFFER,
+                "method": offer_data['method'],
+                "offer_id": offer_data["offer_id"]
+            }
+
+        elif node_state == GET_OFFER:
+            step_kwargs = {
+                "success": True,
+                "uniqid": requests_data['request_id'],
+                "step": "awaiting validation",  # обратная совместимость
+                "bot_items": requests_data['assets']
+            }
+
+        elif node_state == VALIDATION_OFFER:
+            offers = []
+            method = None
+            for offer_id, offer_data in requests_data["offers"].items():
+                kwargs = {
+                    "offer_id": offer_id,
+                    "bot_id": offer_data["bot_id"],
+                    "method": offer_data['method'],
+                    "skins": offer_data["skins_data"],
+                    "main_offer": offer_data["main_offer"]
+                }
+                if method is None:
+                    method = offer_data["method"]
+                offers.append(kwargs)
+
+            step_kwargs = {
+                "success": True,
+                "uniqid": requests_data['request_id'],
+                "step": node_state,
+                "balance": requests_data['balance'],
+                "offers": sorted(offers, key=self.sorting_offers_by_main),
+                "method": method
+            }
+
+        elif node_state == SEND_OFFER:
+            step_kwargs = {
+                "success": True,
+                "uniqid": requests_data['request_id'],
+                "offer_id": offer_data["offer_id"],
+                "method": offer_data['method'],
+                "step": SEND_OFFER
+            }
+
+        elif node_state == MOBILE_CONFIRMATION:
+            step_kwargs = {
+                "success": True,
+                "uniqid": requests_data['request_id'],
+                "offer_id": offer_data["offer_id"],
+                "method": offer_data['method'],
+                "step": MOBILE_CONFIRMATION
+            }
+
+        elif node_state in [WAITING, USER_CONFIRMATION]:
+            method = offer_data['method']
+            offer_type = "physical" if offer_data.get("bot_id") is not None else "virtual"
+            if method == "Deposit" and offer_type == "virtual":
+                return
+
+            step_kwargs = {
+                "success": True,
+                "uniqid": requests_data['request_id'],
+                "tradeofferid": offer_data['tradeofferid'],
+                "offer_id": offer_data["offer_id"],
+                "step": WAITING,
+                "method": method,
+                "bot_id": offer_data['bot_id'],
+                "type": offer_type
+            }
+
+        elif node_state in [AWAITING_OFFER, AWAITING_VIRTUAL_OFFER]:
+            # Все данные по ожидающим офферам отправляются при 'Validation offer'
+            return
+
+        elif node_state == AWAITING_PAYMENT:
+            step_kwargs = {
+                "success": True,
+                "uniqid": requests_data['request_id'],
+                "offer_id": offer_data["offer_id"],
+                "token": requests_data["token"],
+                "step": AWAITING_PAYMENT,
+                "method": offer_data["method"]
+            }
+
+        step_kwargs.update({'steamid64': str(requests_data['steamid64'])})  # Фронтенд ожидает увидеть str
+        make_request(step_kwargs)
+
+
+    def search_through(self, passed_steps, request_data, offer_data, skip=True):
+        """
+        Навигация по графу состояний обмена.
+
+        Навигация веток слева на право.
+        Самая левая ветка всегда default. Далее ветка ошибок.
+        Следующие две ветки опциональны и по ним необходимо проверять доп условия.
+
+        """
+
+        offer_id = offer_data.get("offer_id")
+        was_sent = False
+
+        if self != passed_steps.get(request_data['request_id'], {}).get("offers", {}).get(offer_id):
+            self.send(self.state, request_data, offer_data)
+            was_sent = True
+
+        if skip and was_sent and self.state in [GET_OFFER, VALIDATION_OFFER]:
+            # Принудительно выходим на этих степах, чтобы не отправлять дублированные степы при мультитрейдинге
+            return self
+
+        # request_data.get("state"), если офферы еще не созданы
+        offer_state = offer_data.get('state') or request_data.get("state")
+        if offer_state is None or self.state == offer_state:
+            # Совпадение текущего степа и пришедшего из базы
+            return self
+
+        if self.is_last():
+            return self
+
+        if self.awaiting_payment is not None:
+            if request_data.get("token") is not None:
+                return self.awaiting_payment.search_through(passed_steps, request_data, offer_data)
+
+        if self.awaiting_offer is not None:
+            if offer_data["bot_id"] is None:
+                return self.awaiting_virtual_offer.search_through(passed_steps, request_data, offer_data)
+            return self.awaiting_offer.search_through(passed_steps, request_data, offer_data)
+
+        if self.state == AWAITING_OFFER and offer_state == VALIDATION_OFFER:
+            # Избегаем повторной отправки 'Validation offer' на ожидающих офферах
+            return self
+
+        if self.decline_main_offer is not None:
+            if self.decline_main_offer.state == offer_state:
+                return self.decline_main_offer.search_through(passed_steps, request_data, offer_data)
+
+        if self.children_right is not None and self.is_error(offer_state):
+            return self.children_right.search_through(passed_steps, request_data, offer_data)
+        return self.children_left.search_through(passed_steps, request_data, offer_data)
+
+
+class StepNotification(object):
+    """Отправка степов."""
+
+    def __init__(self):
+        self.get_offer = self.create_graph(GET_OFFER)
+        self._min_id = None
+        self.passed_steps = OrderedDict()
+
+        self.database = Database(commit=True)
+        self.database.cursor = self.database.db.cursor(MySQLdb.cursors.DictCursor)
+
+
+    def create_graph(self, last_node):
+        """
+        Принудительно проходим через 'Awaiting Offer' и 'Awaiting Virtual Offer' степы (не считая 'Awaiting payment'),
+        т.к. они все равно не отправляют данные на фронтенд. (Для удобства построения графа)
+
+        """
+        awaiting_payment = Node(AWAITING_PAYMENT)
+        if last_node == AWAITING_PAYMENT:
+            return awaiting_payment
+
+        decline_main_offer = Node(DECLINE_MAIN_OFFER)
+        if last_node == DECLINE_MAIN_OFFER:
+            return decline_main_offer
+
+        user_confirmation = Node(USER_CONFIRMATION)
+        if last_node == USER_CONFIRMATION:
+            return user_confirmation
+
+        waiting = Node(WAITING)
+        if last_node == WAITING:
+            return waiting
+
+        confirmation = Node(MOBILE_CONFIRMATION, waiting)
+        if last_node == confirmation:
+            return confirmation
+
+        send_error = Node(SEND_ERROR, errors=ERRORS_ON_SEND_OFFER)
+        if last_node == SEND_ERROR:
+            return send_error
+
+        send_offer = Node(SEND_OFFER, confirmation)
+        if last_node == SEND_OFFER:
+            return send_offer
+
+        # send_offer используется для того, чтобы повторно не отправить 'Validation offer'
+        awaiting_offer = Node(AWAITING_OFFER, send_offer, send_error, decline_main_offer=decline_main_offer, errors=ERRORS_ON_SEND_OFFER)
+        if last_node == AWAITING_OFFER:
+            return awaiting_offer
+
+        awaiting_virtual_offer = Node(AWAITING_VIRTUAL_OFFER, user_confirmation, decline_main_offer=decline_main_offer)
+        if last_node == AWAITING_VIRTUAL_OFFER:
+            return awaiting_virtual_offer
+
+        validation_error = Node(VALIDATION_ERROR)
+        if last_node == VALIDATION_ERROR:
+            return validation_error
+
+        validation_offer = Node(VALIDATION_OFFER, send_offer, send_error, awaiting_offer, awaiting_virtual_offer, awaiting_payment=awaiting_payment, errors=ERRORS_ON_SEND_OFFER)
+        if last_node == VALIDATION_OFFER:
+            return validation_offer
+
+        if last_node == GET_OFFER:
+            return Node(GET_OFFER, validation_offer, validation_error, errors=ERRORS_ON_VALIDATION)
+
+
+    def calculate_min_id(self):
+        min_id = -1
+        for requests_id, requests_data in self.passed_steps.items():
+            offers = requests_data.get("offers")
+
+            # Проверяем 'Validation error' статусы
+            if offers is None:
+                node = requests_data["step"]
+                if node.is_last():
+                    self.passed_steps.pop(requests_id)
+                    min_id = requests_id
+                    continue
+
+            # Проверяем каждый оффер по отдельности
+            for offer_id, node in offers.items():
+                if node is not None and node.is_last():
+                    continue
+                break
+            else:
+                self.passed_steps.pop(requests_id)
+                min_id = requests_id
+                continue
+
+            # Доходим до первого незавершенного оффера
+            break
+
+        if min_id != -1:
+            self.min_id = min_id
+
+
+    @property
+    def min_id(self):
+        if not self._min_id:
+            self._min_id = self.database.query(
+                "SELECT MAX(id) AS min_id "
+                "FROM csgomoney.offers_requests"
+            )[0]['min_id']
+        return self._min_id
+
+
+    @min_id.setter
+    def min_id(self, value):
+        self._min_id = value
+        LOGGER.info("StepNotification min_id={}".format(value))
+
+
+    def _fetch_requests(self):
+        """
+        Селектит данные запроса. После проверяет на заполненность поле original_requests_id. Если оно заполнено, то это
+        дупликат и необходимо переселектить данные.
+
+        @return: Данные реквеста и ссылка на родителя, если это дублирующий реквест.
+
+        """
+        requests = self.database.query(
+            "SELECT "
+            "tb1.id as request_id, "
+            "tb1.original_requests_id, "
+            "tb1.steamid64, "
+            "tb1.description as state, "
+            "tb1.callback, "
+            "tb2.balance, "
+            "tb3.token "
+            "FROM csgomoney.offers_requests as tb1 LEFT JOIN csgomoney.users as tb2 USING(steamid64) "
+            "LEFT JOIN merchants.G2A as tb3 ON tb1.id=tb3.requests_id "
+            "WHERE tb1.id>{} "
+            "ORDER BY tb1.id ASC"
+            "".format(self.min_id)
+        )
+
+        requests_info = {}
+        original_requests_id = {}
+
+        for request in requests:
+
+            original_id = request.get('original_requests_id')
+            if original_id is not None:
+                original_requests_id[original_id] = request['request_id']
+                request['request_id'] = original_id
+
+            request.update({"offers": {}})
+
+            if request["callback"] is not None:
+                request.update({"callback": ujson.loads(request["callback"])})
+            requests_info.update({request.get('request_id'): request})
+
+        return requests_info, original_requests_id
+
+
+    def _fetch_offers(self, requests_info):
+        requests_frm = ", ".join([str(request_id) for request_id in requests_info])
+        offers_data = self.database.query(
+            "SELECT "
+                "tb1.id as offer_id, tb1.requests_id, tb1.state, tb1.tradeofferid, tb1.error, tb1.awaiting_offer_id, "
+                "tb1.main as main_offer, tb2.bot_id as bot_id, tb1.method " 
+            "FROM csgomoney.offers as tb1 LEFT JOIN state.control as tb2 ON tb1.steamid=tb2.steamid "
+            "WHERE tb1.requests_id IN ({}) "
+            "ORDER BY tb1.requests_id ASC"
+            "".format(requests_frm)
+        )
+
+        for offer_data in offers_data:
+            request_id = offer_data['requests_id']
+            offer_id = offer_data.get('offer_id')
+            requests_info[request_id]["offers"].update({offer_id: offer_data})
+
+
+    def _fetch_offers_skins(self, requests_info):
+        primary_requests = set()
+        # Ищем request_id, на степы которых пригодятся данные о скинах
+        for request_id, request_data in requests_info.items():
+            if not request_data["offers"]:
+                primary_requests.add(str(request_id))
+                continue
+
+            for offer_id, offer_info in request_data["offers"].items():
+                current_step = self.passed_steps.get(request_id, {}).get(offer_id)
+                if current_step is None or current_step.state in ["Get offer"]:
+                    primary_requests.add(str(request_id))
+                    break
+
+                elif offer_info.get("state", "") in ["Get offer", "Validation offer"] + ERRORS_ON_VALIDATION:
+                    primary_requests.add(str(request_id))
+                    break
+
+
+        if not primary_requests:
+            return defaultdict(list)
+
+        requests = ", ".join(primary_requests)
+        offers_skins_data = self.database.query(
+            "SELECT requests_id, assetid, offer_id, user_skin_id, type, appid "
+            "FROM csgomoney.offers_skins "
+            "WHERE requests_id IN ({}) "
+            "UNION ALL "
+            "SELECT requests_id, current_assetid as assetid, offer_id, user_skin_id, type, appid "
+            "FROM csgomoney.offers_skins_dota "
+            "WHERE requests_id IN ({})"
+            "".format(requests, requests)
+        )
+
+        bot_skins = defaultdict(list)
+        for offer in offers_skins_data:
+            request_id = offer['requests_id']
+            assetid = offer['assetid']
+            offer_id = offer['offer_id']
+            who = offer["type"]
+
+            if who == "bot":
+                bot_skins[request_id].append(str(assetid))
+
+            if offer_id is not None:
+                if offer_id not in requests_info[request_id]["offers"]:
+                    # Не группируем скины на офферы, которых нет
+                    continue
+
+                user_skin_id = offer['user_skin_id']
+                assetid = str(user_skin_id if bool(user_skin_id) else assetid)
+
+                offer = requests_info[request_id]["offers"][offer_id]
+                offer.setdefault("skins_data", {"bot": [], "partner": []})
+                offer["skins_data"][who].append(assetid)
+
+
+        # Скины отдаваемые в 'awaiting offer'
+        for request_id in requests_info:
+            request = requests_info[request_id]
+            request.update({"assets": bot_skins.get(request_id)})
+
+
+    def fetch_requests_data(self):
+        """
+        Селектит данные запроса, офферов и скинов.
+
+        Важно:
+            Могут приходить дублированные запросы и тогда необходимо вернуть старые данные и новый request_id. Для
+            этого после селекта данных реквеста, оффера и скинов происходит подмена старого request_id на новый.
+
+        @return: Данные запроса.
+
+        """
+        requests_info, original_requests_id = self._fetch_requests()
+
+        while not requests_info:
+            time.sleep(0.3)
+            requests_info, original_requests_id = self._fetch_requests()
+
+        self._fetch_offers(requests_info)
+        self._fetch_offers_skins(requests_info)
+
+        if original_requests_id:
+            for old_request_id, new_request_id in original_requests_id.items():
+                request_data = requests_info[old_request_id]
+
+                for offer_id, offer_data in request_data['offers'].items():
+                    offer_data['requests_id'] = new_request_id
+                    requests_info[old_request_id]['offers'][offer_id] = offer_data
+
+                request_data['request_id'] = new_request_id
+                requests_info[new_request_id] = requests_info.pop(old_request_id)
+
+        return requests_info
+
+
+    def generate(self):
+        try:
+            while True:
+                for request_id, requests_data in self.fetch_requests_data().items():
+
+                    if not requests_data["offers"] and requests_data["callback"] is None and requests_data["state"] is None:
+                        # Отправляем 'Get offer' с задержкой. Иначе придется прерывать рекурсию,
+                        #  так как каждый оффер отдельная транзакция, и у каждого оффера свои степы.
+                        continue
+
+                    if request_id not in self.passed_steps and not requests_data["offers"]:
+                        # Необходимо для случаев, когда офферы не создадутся. Например при 'Refresh inventory'
+                        previous_node = self.passed_steps.get(request_id, {}).get("step") or copy.deepcopy(self.get_offer)
+                        current_node = previous_node.search_through(self.passed_steps, requests_data, offer_data={}, skip=False)
+                        self.passed_steps.update({request_id: {"step": current_node, "offers": {}}})
+                        continue
+
+                    for offer_id in requests_data["offers"]:
+                        # Прописываем все офферы в passed_steps для того,
+                        # чтобы не дублировать 'Get offer' и 'Validation offer'.
+                        # И после достижения 'Validation offer' одновременно всем офферам выставить его.
+                        offers_steps = self.passed_steps.get(request_id, {}).get("offers")
+                        if offers_steps is None:
+                            self.passed_steps.update({request_id: {"offers": {}}})
+                            offers_steps = self.passed_steps.get(request_id)["offers"]
+                        offers_steps.setdefault(offer_id, None)
+
+                    skip_offers = False
+                    for offer_id, offer_data in requests_data["offers"].items():
+                        offers_steps = self.passed_steps.get(request_id)
+                        previous_node = offers_steps["offers"].get(offer_id)
+
+                        if previous_node is None:
+                            for offer_step in offers_steps["offers"].values():
+                                if offer_step is not None and offer_step.state == VALIDATION_OFFER:
+                                    previous_node = copy.deepcopy(offer_step)
+                                    offers_steps["offers"].update({offer_id: previous_node})
+                                    break
+                            else:
+                                previous_node = offers_steps.get("step") or copy.deepcopy(self.get_offer)
+
+                        if skip_offers:
+                            # Пропускаем офферы до тех пор, пока хотя бы один оффер не дойдет до 'Validation offer'
+                            break
+
+                        current_node = previous_node.search_through(self.passed_steps, requests_data, offer_data)
+                        if current_node.state in [GET_OFFER, VALIDATION_OFFER]:
+                            self.passed_steps[request_id].update({"step": current_node})
+                            if current_node.state == GET_OFFER:
+                                skip_offers = True
+
+                        self.passed_steps[request_id]["offers"].update({offer_id: current_node})
+
+                self.calculate_min_id()
+
+        except Exception as e:
+            logging.error(e)
+            logging.exception(traceback.format_exc())
+            raise
+
+
+class SidePaymentNotification(object):
+    """Отправка оповещений о пополнении баланса со сторонних платежных систем."""
+
+    def __init__(self):
+        self.database = Database(commit=True)
+        self._min_id = None
+        self.passed_steps = OrderedDict()
+        self.case_hardened = fetch_case_hardened()
+
+        self.database.cursor = self.database.db.cursor(MySQLdb.cursors.DictCursor)
+
+
+    @property
+    def min_id(self):
+        if not self._min_id:
+            self._min_id = self.database.query(
+                "SELECT MAX(id) as min_id "
+                "FROM csgomoney.transactions "
+                "WHERE status NOT IN ('completed', 'canceled')"
+            )[0]['min_id']
+        return self._min_id
+
+
+    @min_id.setter
+    def min_id(self, value):
+        if self._min_id != value:
+            self._min_id = value
+            LOGGER.info("SidePaymentNotification min_id = {}".format(value))
+
+
+    def fetch_skins(self, offers):
+        offers = ", ".join(str(offer["offer_id"]) for offer in offers if offer["offer_id"] is not None)
+        if not offers:
+            return defaultdict(list)
+
+        csgo_skins = self.database.query(
+            "SELECT "
+                "tb1.id as assetid, current_steamid64, current_assetid, name_id, tb2.name as market_hash_name, "
+                "floatvalue, price, add_price, extra_charge, d, stickers, hold_expiration, patternindex, paintseed, "
+                "nametag, tb2.steam_type, offer_id_listing as offer_id, tb1.appid "
+            "FROM csgomoney.users_skins as tb1 LEFT JOIN goods.skin_names as tb2 ON tb1.name_id=tb2.id "
+            "WHERE offer_id_listing IN ({})"
+            "".format(offers)
+        )
+
+        dota_skins = self.database.query(
+            "SELECT "
+                "tb1.id as assetid, current_steamid64, current_assetid, name_id, tb2.name as market_hash_name, "
+                "tb1.gems, tb1.styles, tb1.gift_from, tb1.dedication, "
+                "price, add_price, extra_charge, hold_expiration, nametag, tb2.steam_type, offer_id_listing as offer_id, tb1.appid "
+            "FROM csgomoney.users_skins_dota as tb1 LEFT JOIN goods.skin_names as tb2 ON tb1.name_id=tb2.id "
+            "WHERE offer_id_listing IN ({})"
+            "".format(offers)
+        )
+
+        skins = defaultdict(list)
+        user_skins = csgo_skins + dota_skins
+        for skin in user_skins:
+            define_blue_percents(skin, self.case_hardened)
+
+            gems = skin.get('gems')
+            styles = skin.get('styles')
+            if gems:
+                skin['gems'] = ujson.loads(gems)
+            if styles:
+                skin['styles'] = ujson.loads(styles)
+
+            if skin["current_steamid64"] is not None:
+                skin.update({"current_steamid64": str(skin["current_steamid64"])})
+            if skin["extra_charge"] is not None:
+                skin.update({"extra_charge": ujson.loads(skin["extra_charge"])})
+            if skin.get("stickers") is not None:
+                skin.update({"stickers": ujson.loads(skin["stickers"])})
+            if skin["add_price"] is not None:
+                # В таблицах price = price_trader + add_price, на фронтенде необходимо вычесть
+                skin.update({"price": skin["price"] - skin["add_price"]})
+
+            rate = get_rate(skin.pop("steam_type"), skin["price"], skin['appid'], skin['name_id'])
+            skin.update({"rate": int(rate * 100)})
+
+            skin = {k: v for k, v in skin.items() if v is not None}
+            skins[skin.pop("offer_id")].append(skin)
+
+        return skins
+
+
+    def fetch_notifications(self):
+        notifications = self.database.query(
+            "SELECT tb1.id,steamid64,received,balance,source,status,offer_id,tb3.method as method,tb3.requests_id "
+            "FROM csgomoney.transactions as tb1 LEFT JOIN csgomoney.users as tb2 USING(steamid64) "
+            "LEFT JOIN csgomoney.offers as tb3 ON tb1.offer_id=tb3.id "
+            "WHERE tb1.id>{} AND source IN ('G2A', 'qiwi', 'tinkoff', 'walletone', 'paymaster', 'cardpay') "
+            "ORDER BY tb1.id ASC ".format(self.min_id)
+        )
+
+        skins = self.fetch_skins(notifications)
+        for kwargs in notifications:
+            kwargs.update({"skins": skins.get(kwargs['offer_id'])})
+
+        return notifications
+
+
+    def send(self, kwargs):
+        if kwargs['status'] == "pending":
+            if kwargs["id"] not in self.passed_steps:
+                self.passed_steps.update({kwargs["id"]: kwargs['status']})
+            return
+
+
+        if kwargs['id'] not in self.passed_steps or self.passed_steps[kwargs['id']] != kwargs['status']:
+            step_kwargs = {
+                "uniqid": kwargs['requests_id'],
+                "steamid64": str(kwargs['steamid64']),
+                "balance": kwargs['balance'],
+                "source": kwargs['source'],
+                "status": kwargs['status'],
+                "added_fund": abs(kwargs['received'])
+            }
+
+            if kwargs["skins"]:
+                step_kwargs.update({
+                    "skins": kwargs["skins"],
+                    "method": kwargs["method"]
+                })
+
+            make_request(step_kwargs)
+            self.passed_steps.update({kwargs["id"]: kwargs['status']})
+
+
+    def get_min_id(self):
+        min_id = -1
+        for offer_id, status in self.passed_steps.items():
+            if status not in ["pending", "rejected"]:
+                self.passed_steps.pop(offer_id)
+                min_id = offer_id
+                continue
+            break
+        return min_id if min_id != -1 else self.min_id
+
+
+    def generate(self):
+        while True:
+            all_notification = self.fetch_notifications()
+            for notification in all_notification:
+                self.send(notification)
+
+            self.min_id = self.get_min_id()
+
+
+def get_rate_data():
+    with Database() as database:
+        selected_rate_data = database.mysqlQuery(
+            "SELECT name_id, name, item_type, can, increase, price, '730' as appid FROM goods.csgo UNION ALL "
+            "SELECT name_id, name, item_type, can, increase, price, '730' as appid FROM goods.rare_patterns UNION ALL "
+            "SELECT name_id, name, item_type, can, increase, price, '570' as appid FROM goods.dota2"
+            , withoutCommit=True
+        )
+
+    # Совместимость при релизе
+    try:
+        utilities = {730: Utilities(appid=730), 570: Utilities(appid=570)}
+    except:
+        utilities = {730: Utilities, 570: Utilities}
+
+    rates_data = {}
+    for name_id, name, type, can, increase, price, appid in selected_rate_data:
+        rates_data[name_id] = utilities[int(appid)].changeType(name, type, price, can, increase, appid)
+
+    return rates_data
+
+
+class OfferNotification(object):
+    rate_data = get_rate_data()
+
+    # Для совместимости
+    try:
+        validation_rates = {730: Validation(appid=730).rates, 570: Validation(appid=570).rates}
+    except:
+        validation_rates = {730: Validation().rates, 570: Validation().rates}
+
+    unfinished_statuses = ["pending", "awaiting", "pending hold", "review", "hold", "unpaid", "AUTHORIZED", "REVERSED",
+                           "PARTIAL_REFUNDED", "expired"]
+
+    def __init__(self):
+        self.database = Database(commit=True)
+        self.database.cursor = self.database.db.cursor(MySQLdb.cursors.DictCursor)
+
+        self._min_id = None
+        self.passed_steps = OrderedDict()
+        self.case_hardened = fetch_case_hardened()
+
+
+    @property
+    def min_id(self):
+        if not self._min_id:
+            self._min_id = self.database.query(
+                "SELECT MAX(id) AS min_id "
+                "FROM csgomoney.offers_requests"
+            )[0]['min_id']
+
+        return self._min_id
+
+
+    @min_id.setter
+    def min_id(self, value):
+        self._min_id = value
+        LOGGER.info("OfferNotification min_id={}".format(value))
+
+
+    def fetch_skins(self, offers):
+        offers = ", ".join(str(offer_id) for offer_id in offers)
+        if not offers:
+            return defaultdict(list)
+
+        # Физические скины, которые человек получил после обмена
+        csgo_offers_skins = self.database.query(
+            "SELECT "
+                "tb1.steamid64, assetid, new_assetid, tb1.name_id, tb2.name as market_hash_name, tb1.floatvalue, "
+                "tb1.price, tb1.add_price, tb1.extra_charge, tb1.custom_price, tb1.stickers, tb1.d, "
+                "tb1.hold_expiration, tb1.patternindex, tb1.paintseed, tb1.nametag, tb2.steam_type, offer_id, "
+                "tb3.id as user_skin_id, tb3.status as user_skin_status, tb1.appid, tb3.popular "
+            "FROM csgomoney.offers_skins as tb1 LEFT JOIN goods.skin_names as tb2 ON tb1.name_id=tb2.id "
+            "LEFT JOIN csgomoney.users_skins as tb3 ON tb1.user_skin_id=tb3.id "
+            "WHERE offer_id IN ({}) AND "
+                "((tb1.type='bot' AND tradable=0) OR (tb3.id IS NOT NULL AND tb3.status='on sale'))"
+            "".format(offers)
+        )
+
+        # Виртуальные скины, которые человек получил после обмена или выставленные скины на площадку
+        csgo_users_skins = self.database.query(
+            "SELECT "
+                "tb1.id as assetid, current_steamid64, current_assetid, name_id, tb2.name as market_hash_name, "
+                "floatvalue, price, add_price, extra_charge, custom_price, d, stickers, hold_expiration, "
+                "patternindex, paintseed, nametag, tb2.steam_type, offer_id_listing as offer_id, "
+                "tb1.id as user_skin_id, tb1.status as user_skin_status, tb1.appid, tb1.popular "
+            "FROM csgomoney.users_skins as tb1 LEFT JOIN goods.skin_names as tb2 ON tb1.name_id=tb2.id "
+            "WHERE offer_id_listing IN ({})"
+            "".format(offers)
+        )
+
+        # Физические скины, которые человек получил после обмена
+        dota_offers_skins = self.database.query(
+            "SELECT "
+                "tb1.steamid64, tb1.current_assetid as assetid, new_assetid, tb1.name_id, tb2.name as market_hash_name, "
+                "tb1.price, tb1.add_price, tb1.extra_charge, tb1.custom_price, tb1.appid, tb1.gems, tb1.styles, tb1.gift_from, tb1.dedication, "
+                "tb1.hold_expiration, tb1.nametag, tb2.steam_type, offer_id, tb3.id as user_skin_id, tb3.popular "
+            "FROM csgomoney.offers_skins_dota as tb1 LEFT JOIN goods.skin_names as tb2 ON tb1.name_id=tb2.id "
+            "LEFT JOIN csgomoney.users_skins_dota as tb3 ON tb1.user_skin_id=tb3.id "
+            "WHERE offer_id IN ({}) AND "
+            "((tb1.type='bot' AND tradable=0) OR (tb3.id IS NOT NULL AND tb3.status='on sale'))"
+            "".format(offers)
+        )
+
+        # Виртуальные скины, которые человек получил после обмена или выставленные скины на площадку
+        dota_users_skins = self.database.query(
+            "SELECT "
+                "tb1.id as assetid, current_steamid64, current_assetid, name_id, tb2.name as market_hash_name, "
+                "price, add_price, extra_charge, custom_price, hold_expiration, "
+                "nametag, tb2.steam_type, offer_id_listing as offer_id, tb1.gems, tb1.styles, tb1.gift_from, tb1.dedication, "
+                "tb1.id as user_skin_id, tb1.status as user_skin_status, tb1.appid, tb1.popular "
+            "FROM csgomoney.users_skins_dota as tb1 LEFT JOIN goods.skin_names as tb2 ON tb1.name_id=tb2.id "
+            "WHERE offer_id_listing IN ({})"
+            "".format(offers)
+        )
+
+        skins = defaultdict(list)
+        for skin in list(csgo_offers_skins) + list(csgo_users_skins) + list(dota_offers_skins) + list(dota_users_skins):
+            define_blue_percents(skin, self.case_hardened)
+
+            gems = skin.get('gems')
+            styles = skin.get('styles')
+            if gems:
+                skin['gems'] = ujson.loads(gems)
+            if styles:
+                skin['styles'] = ujson.loads(styles)
+
+            if skin.get("new_assetid") is not None:
+                skin.update({
+                    "previous_assetid": skin.pop("assetid"),
+                    "assetid": skin.pop("new_assetid")
+                })
+
+            elif skin.get("user_skin_status") is not None and skin.get("new_assetid") is None:
+                # При 'Virtual Accept' previous_assetid и assetid это user_skin_id
+                skin.update({
+                    "previous_assetid": skin.get("user_skin_id"),
+                    "assetid": skin.pop("user_skin_id")
+                })
+
+
+            if skin.get("current_steamid64") is not None:
+                skin.update({"current_steamid64": str(skin.get("current_steamid64"))})
+            if skin["extra_charge"] is not None:
+                skin.update({"extra_charge": ujson.loads(skin["extra_charge"])})
+            if skin.get("stickers") is not None:
+                skin.update({"stickers": ujson.loads(skin["stickers"])})
+            if skin["add_price"] is not None:
+                # В таблицах price = price_trader + add_price, на фронтенде необходимо вычесть
+                skin.update({"price": skin["price"] - skin["add_price"]})
+
+            rate = get_rate(skin.pop("steam_type"), skin["price"], skin['appid'], skin['name_id'])
+            skin.update({"rate": int(rate * 100)})
+
+            skin = {k: v for k, v in skin.items() if v is not None}
+            skins[skin.pop("offer_id")].append(skin)
+
+        return skins
+
+
+    def fetch_offers(self):
+        """
+        Селектит данные офферов.
+
+        Алгоритм:
+            1. Селект всех офферов, по которым будут получаться данные.
+            2. Дублированных офферов нет в таблице offers, поэтому добираем их из offers_requests.
+            3. Создаём структуру хранения выше полученных данных для удобной работы далее.
+               Примечание:
+                    В этой структуре по ключу None будут хранится requests_id всех офферов по которым будут добираться
+                    данные.
+            4. Селект всех данных для офферов.
+            5. Селект всех данных скинов для офферов.
+            6. Добавление скинов в данные о оффере.
+            7. Обновление requests_id у оффера.
+               Примечание:
+                    Обновляется на последний клик, то есть данные будут от первого клика, а requests_id от последнего.
+
+        Важно:
+            Выше под кликом имеется ввиду нажатие на кнопку trade.
+
+        @return: Данный офферов.
+
+        """
+        requests = self.database.query(
+            "SELECT requests_id "
+            "FROM csgomoney.offers "
+            "WHERE requests_id>{} AND "
+                "state IN ('Accept', 'Decline our', 'Decline partner', 'Waiting', 'Counter Offer Made', "
+                "'Hold', 'Unavailable our', 'Unavailable partner', 'Unavailable duplicate', 'User confirmation', "
+                "'Virtual Accept', 'Virtual Decline', 'Awaiting Virtual Offer', 'Awaiting Offer')"
+            "".format(self.min_id)
+        )
+        if not requests:
+            return None
+
+        duplicate_requests = self.database.query(
+            "SELECT id as requests_id, original_requests_id "
+            "FROM csgomoney.offers_requests "
+            "WHERE id>{} AND status='duplicated'"
+            "".format(self.min_id)
+        )
+        requests += duplicate_requests
+
+        original_to_applicate = defaultdict(list)
+        for response in requests:
+            original_to_applicate[response.get('original_requests_id')].append(response.get('requests_id'))
+
+        offers_data = self.database.query(
+            "SELECT "
+                "tb1.id as offer_id,"
+                "tb2.id as requests_id,"
+                "tb2.original_requests_id,"
+                "tb2.steamid64,"
+                "tb3.balance,"
+                "tb1.state,"
+                "tb1.tradeofferid,"
+                "tb4.status,"
+                "tb2.on_wallet,"
+                "tb4.received, "
+                "tb4.source, "
+                "tb5.bot_id as bot_id, "
+                "tb1.method "
+            "FROM csgomoney.offers as tb1 LEFT JOIN csgomoney.offers_requests as tb2 ON tb1.requests_id=tb2.id "
+                "LEFT JOIN csgomoney.users as tb3 ON tb2.steamid64=tb3.steamid64 "
+                "LEFT JOIN csgomoney.transactions as tb4 ON tb1.requests_id=tb4.merchant_id AND tb1.id=tb4.offer_id "
+                "LEFT JOIN state.control as tb5 ON tb1.steamid=tb5.steamid "
+            "WHERE "
+                "tb1.requests_id IN ({}) AND "
+                "tb1.state IN ('Accept', 'Decline our', 'Decline partner', 'Waiting', 'Counter Offer Made', "
+                "'Hold', 'Unavailable our', 'Unavailable partner', 'Unavailable duplicate', 'User confirmation', "
+                "'Virtual Accept', 'Virtual Decline', 'Awaiting Virtual Offer', 'Awaiting Offer') "
+            "ORDER BY tb1.id ASC"
+            "".format(", ".join(str(request_id) for request_id in original_to_applicate[None]))
+        )
+
+        skins_data = self.fetch_skins([str(kwargs['offer_id']) for kwargs in offers_data if kwargs.get('state') is not None and "Accept" in kwargs['state']])
+        for offer in offers_data:
+            offer.update({"skins": skins_data.get(offer.get('offer_id'))})
+
+            list_requests_id = original_to_applicate[offer['requests_id']]
+            if list_requests_id:
+                offer['requests_id'] = list_requests_id[-1]
+
+        return offers_data
+
+
+    def change_state(self, state):
+        if "Accept" in state:
+            return "Accept"
+        return "Decline"
+
+
+    def send(self, kwargs):
+        status = kwargs["status"]
+        if status is None and kwargs['state'] in ['Waiting', 'User confirmation', 'Awaiting Virtual Offer', 'Awaiting Offer']:
+            # Те транзакции, у которых нет offer_id
+            return
+
+        requests_id = kwargs["requests_id"]
+        offer_id = kwargs["offer_id"]
+
+        if requests_id not in self.passed_steps and status in ["pending", "awaiting"]:
+            self.passed_steps.setdefault(requests_id, {})
+            self.passed_steps[requests_id].update({offer_id: status})
+            return
+
+        elif status in OfferNotification.unfinished_statuses:
+            return
+
+        if requests_id not in self.passed_steps or self.passed_steps[requests_id].get(offer_id, "") != status:
+            step_kwargs = {
+                "success": True,
+                "uniqid": requests_id,
+                "offer_id": offer_id,
+                "steamid64": str(kwargs['steamid64']),
+                "state": self.change_state(kwargs['state']),
+                "real_state": kwargs['state'],
+                "balance": kwargs['balance'],
+                "source": kwargs['source'],
+                "bot_id": kwargs["bot_id"],
+                "tradeofferid": kwargs['tradeofferid'],
+                "type": "physical" if kwargs.get("bot_id") else "virtual",
+                "step": "user_response"
+            }
+
+            if status == "completed" and kwargs['on_wallet'] > 0:
+                step_kwargs.update({"added_fund": abs(kwargs['received'])})
+
+            if status == "canceled" and kwargs['on_wallet'] < 0:
+                step_kwargs.update({"added_fund": abs(kwargs['received'])})
+
+            if "Accept" in kwargs['state'] and kwargs["method"] in ["Trade", "Deposit", "Withdraw"]:
+                step_kwargs.update({
+                    "method": kwargs["method"],
+                    "skins": kwargs["skins"]
+                })
+
+            make_request(step_kwargs)
+
+            self.passed_steps.setdefault(requests_id, {})
+            self.passed_steps[requests_id].update({offer_id: status})
+
+
+    def set_min_id(self):
+        min_id = -1
+        for requests_id, offers in self.passed_steps.items():
+
+            # Проверяем каждый оффер в реквесте
+            for offer_id, status in offers.items():
+                if status in OfferNotification.unfinished_statuses:
+                    break
+                continue
+            else:
+                self.passed_steps.pop(requests_id)
+                min_id = requests_id
+                continue
+
+            break
+
+        if min_id != -1:
+            self.min_id = min_id
+
+
+    def generate(self):
+        while True:
+            all_offers = ()
+            while not all_offers:
+                all_offers = self.fetch_offers()
+                time.sleep(0.3)
+
+            for offer in all_offers:
+                self.send(offer)
+            self.set_min_id()
+
+
+
+class SoldNotification(object):
+    """
+    Отправка сообщений о продаже скина пользователя на торговой площадке.
+
+    """
+    def __init__(self):
+        self.database = Database(commit=True)
+        self.database.cursor = self.database.db.cursor(MySQLdb.cursors.DictCursor)
+        self.last_time = datetime.now()
+
+
+    def fetch_sold_skins(self):
+        csgo_sold_skins = self.database.query(
+            "SELECT tb1.id as user_skin_id, tb1.steamid64, tb1.update_time, tb2.balance, tb3.received, tb1.appid, tb1.popular "
+            "FROM csgomoney.users_skins as tb1  LEFT JOIN csgomoney.users as tb2 ON tb1.steamid64=tb2.steamid64 "
+            "LEFT JOIN csgomoney.transactions as tb3 ON tb1.transaction_id=tb3.id "
+            "WHERE tb1.update_time>'{}' and tb1.status='sold' "
+            "ORDER BY tb1.update_time ASC "
+            "".format(self.last_time)
+        )
+
+        dota_sold_skins = self.database.query(
+            "SELECT tb1.id as user_skin_id, tb1.steamid64, tb1.update_time, tb2.balance, tb3.received, tb1.appid, tb1.gems, "
+                "tb1.styles, tb1.gift_from, tb1.dedication, tb1.popular "
+            "FROM csgomoney.users_skins_dota as tb1  LEFT JOIN csgomoney.users as tb2 ON tb1.steamid64=tb2.steamid64 "
+            "LEFT JOIN csgomoney.transactions as tb3 ON tb1.transaction_id=tb3.id "
+            "WHERE tb1.update_time>'{}' and tb1.status='sold' "
+            "ORDER BY tb1.update_time ASC"
+            "".format(self.last_time)
+        )
+
+        return csgo_sold_skins + dota_sold_skins
+
+
+    def send(self, sold_skin):
+
+        gems = sold_skin.get('gems')
+        styles = sold_skin.get('styles')
+        if gems:
+            sold_skin['gems'] = ujson.loads(gems)
+        if styles:
+            sold_skin['styles'] = ujson.loads(styles)
+
+        sold_skin.pop("update_time", None)
+        sold_skin.update({
+            "method": "sold",
+            "steamid64": str(sold_skin["steamid64"])
+        })
+        make_request(sold_skin)
+
+
+    def set_last_time(self, last_time):
+        """
+        Обновляет время с которого начинается мониторинг данных, что бы не пришлось обрабатывать большое количество 
+        устаревших данных.
+
+        @param last_time: Крайнее время продажи скина.
+
+        """
+        self.last_time = last_time
+
+
+    def run(self):
+        """
+        Постоянно селектит проданные скины и если такие появились, то отправляет сообщения о их продаже.
+
+        """
+        while True:
+
+            sold_skins = ()
+            while not sold_skins:
+                sold_skins = self.fetch_sold_skins()
+
+                time.sleep(2)
+
+            for sold_skin in sold_skins:
+                self.send(dict(sold_skin))
+ 
+            if sold_skins:
+               self.set_last_time(sold_skins[-1]['update_time'])
+
+
+
+class TaskDistribution:
+    """
+    Распаралеливание отправки нотификаций.
+
+    Важно:
+        Нужно отправлять каждый тип нотификации в своем процессе. Если отправлять все нотификации в одном потоке,
+        то наблюдается задержка при отправке офферов (до нескольких секунд).
+
+    """
+    def __init__(self):
+        self.processes = {}
+
+
+    def create_process(self, class_name):
+        """
+        Создаёт процессы.
+
+        @param class_name: Имя класса, для которого необходимо создать процесс.
+
+        """
+        process = Process(target=run_notification, args=(class_name,), name=class_name.__name__)
+        process.start()
+
+        self.processes.update({class_name: process})
+
+
+    def is_active(self, name_class):
+        """
+        Проверка процесса на то, что он актитвен.
+
+        """
+        return self.processes[name_class].is_alive()
+
+
+    def run(self):
+        """
+        Запускает процессы для всех классов нотификаций.
+
+        """
+        self.create_process(StepNotification)
+        self.create_process(OfferNotification)
+        self.create_process(SidePaymentNotification)
+        self.create_process(SoldNotification)
+
+        while True:
+            for name_class, status in self.processes.items():
+
+                if not self.is_active(name_class):
+                    logging.info(f'Restart process {name_class}')
+                    self.create_process(name_class)
+
+            else:
+                time.sleep(2)
+
+
+
+if __name__ == '__main__':
+    TaskDistribution().run()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# -*- coding: utf-8 -*-
+"""
+Тесты для файла manage_frozen_offers.py
+
+Для запуска тестов находясь в директории проекта необходимо исполнить "python -m pytest"
+
+"""
+from decimal import Decimal
+
+from manage_frozen_offers import fetch_transaction_data, set_status_on_users_skins, fetch_frozen_requests, correction_frozen_requests, fetch_frozen_transactions, correction_frozen_transactions
+from steam.others import Database
+from steam.shared import CSGO_OFFERS_SKINS, CSGO_USERS_SKINS
+
+
+def test_fetch_transaction_data():
+    """
+    1. Может ничего не заселектить.
+    2. Может заселектить одну транзакцию и её по особому обрабатывать нужно.
+    3. Может заселектить много транзакций.
+
+    """
+    with Database() as database:
+        no_transaction_data = fetch_transaction_data(118339138, database)
+        # one_transaction_data = fetch_transaction_data(118522395, database)
+        transaction_data = fetch_transaction_data(102761591, database)
+
+    assert no_transaction_data == None
+    # assert None or len(list(one_transaction_data)) == 5
+    assert transaction_data == [(3035298, 44295093, Decimal('-0.10'), 'pending hold')]
+
+
+def test_set_status_on_users_skins():
+    """
+    1. Не должно найти скинов и вернуть None.
+    2. Ничего не возвращает, поэтому будет None. Просто проверка, что полностью отработает.
+
+    """
+    with Database() as database:
+        no_user_skins = set_status_on_users_skins(118449699, (CSGO_OFFERS_SKINS, CSGO_USERS_SKINS), database)
+        set_status = set_status_on_users_skins(118339138, (CSGO_OFFERS_SKINS, CSGO_USERS_SKINS), database)
+
+    assert no_user_skins == None
+    assert set_status == None
+
+
+def test_fetch_frozen_requests():
+    """
+    
+
+    """
+    with Database() as database:
+        frozen_requests = fetch_frozen_requests(database)
+
+
+def test_correction_frozen_requests():
+    """
+
+
+    """
+    with Database() as database:
+        correction_frozen_requests(database)
+
+
+def test_fetch_frozen_transactions():
+    """
+
+
+    """
+    with Database() as database:
+        frozen_transactions = fetch_frozen_transactions(database)
+
+
+def test_correction_frozen_transactions():
+    """
+
+
+    """
+    with Database() as database:
+        correction_frozen_transactions(database)
+
+
+
+if __name__ == '__main__':
+    pass

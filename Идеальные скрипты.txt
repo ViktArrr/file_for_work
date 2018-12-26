@@ -1,0 +1,3 @@
+Имя скрипта					Версия питона		Дата классы в нём
+manage_frozen_offers.py		3.7					Frozen, Requests, Skin
+ws_http.py					3.7					State
